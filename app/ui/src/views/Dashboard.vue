@@ -148,10 +148,10 @@ onMounted(async () => {
     ]);
 
     stats.value = {
-      totalInbox: inboxRes.data?.total || 0,
-      unreadInbox: inboxRes.data?.total || 0,
-      sentMessages: outboxRes.data?.total || 0,
-      totalBatches: batchesRes.data?.total || 0,
+      totalInbox: inboxRes.pagination?.total || 0,
+      unreadInbox: inboxRes.pagination?.total || 0,
+      sentMessages: outboxRes.pagination?.total || 0,
+      totalBatches: batchesRes.pagination?.total || 0,
     };
   } catch (error) {
     console.error('Failed to load dashboard stats:', error);

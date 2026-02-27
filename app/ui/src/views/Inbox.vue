@@ -152,10 +152,16 @@ const loadMessages = async (page = 1) => {
       per_page: 20,
       search: searchQuery.value || undefined,
     });
-    messages.value = response.data.data || [];
-    pagination.value = response.data;
+    // API returns: { success: true, data: [...], pagination: {...} }
+    // api.getInbox() already unwraps response.data, so response is the JSON body
+    console.log('Inbox API Response:', response);
+    messages.value = response.data || [];
+    pagination.value = response.pagination || null;
+    console.log('Loaded messages:', messages.value.length, 'Total:', pagination.value?.total);
   } catch (error) {
     console.error('Failed to load messages:', error);
+    messages.value = [];
+    pagination.value = null;
   } finally {
     loading.value = false;
   }
