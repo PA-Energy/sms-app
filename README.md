@@ -12,8 +12,7 @@ A simple cross-platform SMS application with custom PHP MVC backend and Vue.js f
 ## Prerequisites
 
 - Docker and Docker Compose
-- PHP 8.1+ (for API)
-- Composer (PHP package manager)
+- PHP 8.1+ (for API) - **No Composer needed!**
 - Node.js 18+ and npm (for Vue.js frontend)
 
 ## Quick Setup
@@ -29,15 +28,14 @@ docker-compose up -d mysql
 ```bash
 cd app/api
 
-# Install dependencies (only JWT library)
-composer install
-
 # Setup database and create admin user
 php setup-db.php
 
 # Start API server
 php -S localhost:8000 -t .
 ```
+
+**Note**: No Composer installation needed! The project uses a simple custom autoloader.
 
 Or use the batch file:
 ```bash

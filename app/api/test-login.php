@@ -1,7 +1,7 @@
 <?php
 
 // Simple test script to debug login
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/app/autoload.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
 use App\Core\Database;
@@ -52,8 +52,7 @@ if ($user) {
 // Test token generation
 if ($user) {
     try {
-        use App\Core\Auth;
-        $token = Auth::generateToken($user['id'], $user['username']);
+        $token = \App\Core\Auth::generateToken($user['id'], $user['username']);
         if ($token) {
             echo "✓ Token generation: OK\n";
             echo "  Token: " . substr($token, 0, 20) . "...\n";
