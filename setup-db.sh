@@ -1,5 +1,4 @@
 #!/bin/bash
 echo "Setting up database..."
-cd app/api
+cd "$(dirname "$0")/app/api" || exit 1
 php setup-db.php
-cd ../..
