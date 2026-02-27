@@ -69,9 +69,13 @@ class ApiService {
   async getInbox(params?: { page?: number; per_page?: number; is_read?: boolean; search?: string }) {
     try {
       const response = await this.api.get('/sms/inbox', { params });
+      console.log('getInbox raw response:', response);
+      console.log('getInbox response.data:', response.data);
       return response.data;
     } catch (error: any) {
       console.error('getInbox error:', error);
+      console.error('getInbox error response:', error.response);
+      console.error('getInbox error data:', error.response?.data);
       // Return error structure instead of throwing
       return {
         success: false,

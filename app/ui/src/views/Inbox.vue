@@ -160,16 +160,18 @@ const loadMessages = async (page = 1) => {
     
     // Handle different response structures for compatibility
     if (response && typeof response === 'object') {
-      // Check if response has the expected structure: { success: true, data: [...], pagination: {...} }
-      if (response.success !== false && response.data !== undefined) {
-        // Normal response structure
-        messages.value = Array.isArray(response.data) ? response.data : [];
+      // Priority 1: Check if data exists as an array (most reliable check)
+      if (response.data !== undefined && Array.isArray(response.data)) {
+        // Normal response structure - data is an array
+        messages.value = response.data;
         pagination.value = response.pagination || null;
+        console.log('✓ Using data array structure - messages:', messages.value.length, 'pagination:', pagination.value);
       } 
-      // Fallback: check if data is nested differently (e.g., response.data.data)
-      else if (response.data && Array.isArray(response.data.data)) {
+      // Priority 2: Check if data is nested differently (e.g., response.data.data)
+      else if (response.data && typeof response.data === 'object' && Array.isArray(response.data.data)) {
         messages.value = response.data.data;
         pagination.value = response.data.pagination || response.pagination || null;
+        console.log('✓ Using nested data.data structure - messages:', messages.value.length);
       }
       // Fallback: if response is directly an array (unlikely but possible)
       else if (Array.isArray(response)) {
@@ -187,9 +189,16 @@ const loadMessages = async (page = 1) => {
         messages.value = [];
         pagination.value = null;
       }
-      // If we still have no messages, try to extract from any nested structure
+      // If we still have no messages, log the full response for debugging
       else {
-        console.warn('Unexpected response structure:', response);
+        console.warn('⚠ Unexpected response structure - full response:', JSON.stringify(response, null, 2));
+        console.warn('Response keys:', Object.keys(response));
+        console.warn('Response.data type:', typeof response.data, 'isArray:', Array.isArray(response.data));
+        console.warn('Response.pagination:', response.pagination);
+        // Try one more time - maybe data is there but not as expected
+        if (response.pagination && response.pagination.total > 0) {
+          console.warn('⚠ Pagination shows total > 0 but no data array found. This might be a backend issue.');
+        }
         messages.value = [];
         pagination.value = null;
       }
