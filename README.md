@@ -25,29 +25,36 @@ docker-compose up -d mysql
 
 ### 2. Backend Setup
 
-**Option A: Using batch files (Windows - Recommended)**
+**Option A: Using helper scripts (Recommended)**
 ```bash
-# Setup database (from project root)
+# Windows (Command Prompt or PowerShell)
 setup-db.bat
 
-# Start API server
-cd app/api
-start-api.bat
+# Linux/Mac/Git Bash
+chmod +x setup-db.sh
+./setup-db.sh
 ```
 
 **Option B: Manual setup**
 ```bash
-# Setup database and create admin user (must be in app/api directory)
+# Setup database and create admin user (can run from project root)
+php app/api/setup-db.php
+
+# Or from app/api directory
 cd app/api
 php setup-db.php
 
 # Start API server
+cd app/api
 php -S localhost:8000 -t .
 ```
 
 **Note**: No Composer installation needed! The project uses a simple custom autoloader.
 
-**Important**: When running `php setup-db.php`, make sure you're in the `app/api` directory, or use `setup-db.bat` from the project root.
+**Important**: The `setup-db.php` script now works from any directory. You can run it as:
+- `php app/api/setup-db.php` (from project root)
+- `php setup-db.php` (from app/api directory)
+- Use the helper scripts: `setup-db.bat` (Windows) or `setup-db.sh` (Linux/Mac/Git Bash)
 
 ### 3. Frontend Setup
 
