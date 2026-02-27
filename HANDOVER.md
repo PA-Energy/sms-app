@@ -334,4 +334,14 @@ sms-app/
 
 ---
 
+## Document Information
+
+**Prepared by:**  
+Lucky John Faderon  
+Software Developer
+
+**Date:** 2024
+
+---
+
 **End of Handover Prompt**
