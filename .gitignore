@@ -1,0 +1,41 @@
+# Dependencies
+/vendor/
+/node_modules/
+/.vite/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build outputs
+/dist/
+/build/
+
+# PHP
+composer.lock
+.phpunit.result.cache
+
+# Database
+*.sqlite
+*.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

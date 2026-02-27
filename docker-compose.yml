@@ -1,0 +1,67 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: sms_app_mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: sms_app_root_password
+      MYSQL_DATABASE: sms_app
+      MYSQL_USER: sms_app_user
+      MYSQL_PASSWORD: sms_app_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sms_app_network
+
+  php:
+    image: php:8.2-fpm
+    container_name: sms_app_php
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./app/api:/var/www/html
+    networks:
+      - sms_app_network
+    command: php-fpm
+
+  composer:
+    image: composer:latest
+    container_name: sms_app_composer
+    volumes:
+      - ./app/api:/app
+    networks:
+      - sms_app_network
+    entrypoint: ["composer"]
+
+  artisan:
+    image: php:8.2-cli
+    container_name: sms_app_artisan
+    working_dir: /var/www/html
+    volumes:
+      - ./app/api:/var/www/html
+    networks:
+      - sms_app_network
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: sms_app
+      DB_USERNAME: root
+      DB_PASSWORD: sms_app_root_password
+    entrypoint: ["php", "artisan"]
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  sms_app_network:
+    driver: bridge
