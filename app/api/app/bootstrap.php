@@ -26,7 +26,7 @@ define('DB_HOST', $_ENV['DB_HOST'] ?? ($dbConfig['host'] ?? '127.0.0.1'));
 define('DB_PORT', $_ENV['DB_PORT'] ?? ($dbConfig['port'] ?? '3306'));
 define('DB_NAME', $_ENV['DB_DATABASE'] ?? ($dbConfig['database'] ?? 'sms_app'));
 define('DB_USER', $_ENV['DB_USERNAME'] ?? ($dbConfig['username'] ?? 'root'));
-define('DB_PASS', $_ENV['DB_PASSWORD'] ?? ($dbConfig['password'] ?? ''));
+define('DB_PASS', $_ENV['DB_PASSWORD'] ?? ($dbConfig['password'] ?? 'sms_app_root_password'));
 
 // Session token expiry (hours)
 define('TOKEN_EXPIRY_HOURS', $_ENV['TOKEN_EXPIRY_HOURS'] ?? 24);

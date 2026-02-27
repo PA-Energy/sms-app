@@ -11,16 +11,35 @@ class SmsInboxController extends Controller
 {
     public function index()
     {
-        Auth::requireAuth();
-        
-        $page = $_GET['page'] ?? 1;
-        $perPage = $_GET['per_page'] ?? 20;
-        $search = $_GET['search'] ?? '';
-        $isRead = isset($_GET['is_read']) ? (bool)$_GET['is_read'] : null;
+        try {
+            Auth::requireAuth();
+            
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 20;
+            $search = $_GET['search'] ?? '';
+            $isRead = isset($_GET['is_read']) ? (bool)$_GET['is_read'] : null;
 
-        $result = SmsMessage::getAll($page, $perPage, $search, $isRead);
-        
-        return $this->json(['success' => true, 'data' => $result]);
+            $result = SmsMessage::getAll($page, $perPage, $search, $isRead);
+            
+            // Return the result directly (it already has the pagination structure)
+            return $this->json([
+                'success' => true,
+                'data' => $result['data'],
+                'pagination' => [
+                    'current_page' => $result['current_page'],
+                    'per_page' => $result['per_page'],
+                    'total' => $result['total'],
+                    'last_page' => $result['last_page'],
+                ]
+            ]);
+        } catch (\Exception $e) {
+            error_log("SmsInboxController::index error: " . $e->getMessage());
+            return $this->json([
+                'success' => false,
+                'message' => 'Failed to retrieve inbox messages',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function sync()

@@ -1,4 +1,5 @@
 services:
+  # MySQL Database Service
   mysql:
     image: mysql:8.0
     container_name: sms_app_mysql
@@ -6,11 +7,15 @@ services:
     ports:
       - "3306:3306"
     environment:
+      # Root password for MySQL
       MYSQL_ROOT_PASSWORD: sms_app_root_password
+      # Database name - must match DB_DATABASE in app/api/config/database.php
       MYSQL_DATABASE: sms_app
+      # Additional MySQL user (optional, root is used by default)
       MYSQL_USER: sms_app_user
       MYSQL_PASSWORD: sms_app_password
     volumes:
+      # Persistent data storage
       - mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]

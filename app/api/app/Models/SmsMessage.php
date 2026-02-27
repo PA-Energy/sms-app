@@ -9,6 +9,10 @@ class SmsMessage
     public static function getAll($page = 1, $perPage = 20, $search = '', $isRead = null)
     {
         $db = Database::getInstance()->getConnection();
+        
+        // Ensure page and perPage are integers
+        $page = (int)$page;
+        $perPage = (int)$perPage;
         $offset = ($page - 1) * $perPage;
         
         $where = [];
@@ -30,21 +34,20 @@ class SmsMessage
         // Get total count
         $countStmt = $db->prepare("SELECT COUNT(*) as total FROM sms_messages {$whereClause}");
         $countStmt->execute($params);
-        $total = $countStmt->fetch()['total'];
+        $total = (int)$countStmt->fetch()['total'];
         
-        // Get data
-        $stmt = $db->prepare("SELECT * FROM sms_messages {$whereClause} ORDER BY received_at DESC LIMIT ? OFFSET ?");
-        $params[] = $perPage;
-        $params[] = $offset;
+        // Get data - use direct integer values for LIMIT/OFFSET (safe since they're validated as integers)
+        $limitClause = "LIMIT {$perPage} OFFSET {$offset}";
+        $stmt = $db->prepare("SELECT * FROM sms_messages {$whereClause} ORDER BY received_at DESC {$limitClause}");
         $stmt->execute($params);
-        $data = $stmt->fetchAll();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         return [
             'data' => $data,
             'current_page' => $page,
             'per_page' => $perPage,
             'total' => $total,
-            'last_page' => ceil($total / $perPage),
+            'last_page' => $total > 0 ? ceil($total / $perPage) : 1,
         ];
     }
 
