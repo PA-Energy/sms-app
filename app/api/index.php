@@ -1,5 +1,8 @@
 <?php
 
+// Start output buffering to catch any unwanted output
+ob_start();
+
 require_once __DIR__ . '/app/autoload.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
@@ -46,4 +49,10 @@ $router->get('/api/cleanup-tokens', function() {
     exit;
 });
 
+// Clear any output that might have been generated during bootstrap
+ob_clean();
+
 $router->dispatch();
+
+// If we get here, no route matched - ensure clean output
+ob_end_flush();

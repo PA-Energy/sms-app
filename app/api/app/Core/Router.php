@@ -71,10 +71,25 @@ class Router
                     $controllerInstance = new $controllerClass();
                     if (method_exists($controllerInstance, $method)) {
                         try {
-                            return $controllerInstance->$method(...$this->params);
+                            // Clear any output before calling controller
+                            if (ob_get_level()) {
+                                ob_clean();
+                            }
+                            $result = $controllerInstance->$method(...$this->params);
+                            // If controller returns something (shouldn't happen with exit, but just in case)
+                            if ($result !== null) {
+                                header('Content-Type: application/json');
+                                echo is_string($result) ? $result : json_encode($result);
+                            }
+                            exit;
                         } catch (\Exception $e) {
+                            if (ob_get_level()) {
+                                ob_clean();
+                            }
+                            header('Content-Type: application/json');
                             http_response_code(500);
                             echo json_encode([
+                                'success' => false,
                                 'error' => 'Server error',
                                 'message' => $e->getMessage(),
                                 'file' => $e->getFile(),
@@ -83,20 +98,33 @@ class Router
                             exit;
                         }
                     } else {
+                        if (ob_get_level()) {
+                            ob_clean();
+                        }
+                        header('Content-Type: application/json');
                         http_response_code(500);
-                        echo json_encode(['error' => "Method {$method} not found in {$controllerClass}"]);
+                        echo json_encode(['success' => false, 'error' => "Method {$method} not found in {$controllerClass}"]);
                         exit;
                     }
                 } else {
+                    if (ob_get_level()) {
+                        ob_clean();
+                    }
+                    header('Content-Type: application/json');
                     http_response_code(500);
-                    echo json_encode(['error' => "Controller {$controllerClass} not found"]);
+                    echo json_encode(['success' => false, 'error' => "Controller {$controllerClass} not found"]);
                     exit;
                 }
             }
         }
 
+        if (ob_get_level()) {
+            ob_clean();
+        }
+        header('Content-Type: application/json');
         http_response_code(404);
-        echo json_encode(['error' => 'Route not found', 'method' => $method, 'uri' => $uri]);
+        echo json_encode(['success' => false, 'error' => 'Route not found', 'method' => $method, 'uri' => $uri]);
+        exit;
     }
 
     private function convertToRegex($route)

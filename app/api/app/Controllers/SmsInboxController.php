@@ -11,6 +11,11 @@ class SmsInboxController extends Controller
 {
     public function index()
     {
+        // Clear any previous output
+        if (ob_get_level()) {
+            ob_clean();
+        }
+        
         try {
             Auth::requireAuth();
             
@@ -21,23 +26,37 @@ class SmsInboxController extends Controller
 
             $result = SmsMessage::getAll($page, $perPage, $search, $isRead);
             
+            // Ensure we have valid data
+            if (!isset($result['data']) || !is_array($result['data'])) {
+                error_log("SmsInboxController::index - Invalid result structure: " . print_r($result, true));
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Invalid data structure from database',
+                    'data' => [],
+                    'pagination' => null
+                ], 500);
+            }
+            
             // Return the result directly (it already has the pagination structure)
             return $this->json([
                 'success' => true,
                 'data' => $result['data'],
                 'pagination' => [
-                    'current_page' => $result['current_page'],
-                    'per_page' => $result['per_page'],
-                    'total' => $result['total'],
-                    'last_page' => $result['last_page'],
+                    'current_page' => $result['current_page'] ?? $page,
+                    'per_page' => $result['per_page'] ?? $perPage,
+                    'total' => $result['total'] ?? 0,
+                    'last_page' => $result['last_page'] ?? 1,
                 ]
             ]);
         } catch (\Exception $e) {
             error_log("SmsInboxController::index error: " . $e->getMessage());
+            error_log("SmsInboxController::index trace: " . $e->getTraceAsString());
             return $this->json([
                 'success' => false,
                 'message' => 'Failed to retrieve inbox messages',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'data' => [],
+                'pagination' => null
             ], 500);
         }
     }
