@@ -159,7 +159,7 @@ const loadMessages = async (page = 1) => {
     console.log('Inbox API Response:', response);
     
     // Handle different response structures for compatibility
-    if (response) {
+    if (response && typeof response === 'object') {
       // Check if response has the expected structure: { success: true, data: [...], pagination: {...} }
       if (response.success !== false && response.data !== undefined) {
         // Normal response structure
@@ -181,6 +181,12 @@ const loadMessages = async (page = 1) => {
         messages.value = response.messages;
         pagination.value = response.pagination || null;
       }
+      // Error response
+      else if (response.success === false) {
+        console.error('API returned error:', response.error || response.message);
+        messages.value = [];
+        pagination.value = null;
+      }
       // If we still have no messages, try to extract from any nested structure
       else {
         console.warn('Unexpected response structure:', response);
@@ -189,7 +195,7 @@ const loadMessages = async (page = 1) => {
       }
     } else {
       // No response or null response
-      console.error('API returned null or undefined response');
+      console.error('API returned null, undefined, or invalid response:', response);
       messages.value = [];
       pagination.value = null;
     }

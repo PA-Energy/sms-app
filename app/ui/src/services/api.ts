@@ -67,8 +67,19 @@ class ApiService {
 
   // SMS Inbox endpoints
   async getInbox(params?: { page?: number; per_page?: number; is_read?: boolean; search?: string }) {
-    const response = await this.api.get('/sms/inbox', { params });
-    return response.data;
+    try {
+      const response = await this.api.get('/sms/inbox', { params });
+      return response.data;
+    } catch (error: any) {
+      console.error('getInbox error:', error);
+      // Return error structure instead of throwing
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load inbox',
+        data: [],
+        pagination: null
+      };
+    }
   }
 
   async syncInbox() {
