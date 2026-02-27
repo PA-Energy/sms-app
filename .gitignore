@@ -1,7 +1,8 @@
 # Dependencies
-/vendor/
-/node_modules/
-/.vite/
+app/api/vendor/
+app/ui/node_modules/
+app/ui/.vite/
+app/ui/dist/
 
 # Environment files
 .env
