@@ -24,7 +24,7 @@ if (file_exists(__DIR__ . '/../config/database.php')) {
 // The config file's env() calls will use $_ENV values we loaded above
 define('DB_HOST', $_ENV['DB_HOST'] ?? ($dbConfig['host'] ?? '127.0.0.1'));
 define('DB_PORT', $_ENV['DB_PORT'] ?? ($dbConfig['port'] ?? '3306'));
-define('DB_NAME', $_ENV['DB_DATABASE'] ?? ($dbConfig['database'] ?? 'sms-app'));
+define('DB_NAME', $_ENV['DB_DATABASE'] ?? ($dbConfig['database'] ?? 'sms_app'));
 define('DB_USER', $_ENV['DB_USERNAME'] ?? ($dbConfig['username'] ?? 'root'));
 define('DB_PASS', $_ENV['DB_PASSWORD'] ?? ($dbConfig['password'] ?? ''));
 
