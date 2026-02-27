@@ -15,6 +15,13 @@ $router->post('/api/auth/login', 'AuthController@login');
 $router->get('/api/auth/me', 'AuthController@me');
 $router->post('/api/auth/logout', 'AuthController@logout');
 
+// User Management routes (Admin only)
+$router->get('/api/users', 'UserController@index');
+$router->post('/api/users', 'UserController@store');
+$router->get('/api/users/{id}', 'UserController@show');
+$router->put('/api/users/{id}', 'UserController@update');
+$router->delete('/api/users/{id}', 'UserController@destroy');
+
 // SMS Inbox routes
 $router->get('/api/sms/inbox', 'SmsInboxController@index');
 $router->post('/api/sms/inbox/sync', 'SmsInboxController@sync');

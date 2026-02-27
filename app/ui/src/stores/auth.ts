@@ -5,6 +5,7 @@ interface User {
   id: number;
   username: string;
   email?: string;
+  role?: string;
 }
 
 interface AuthState {
@@ -29,6 +30,12 @@ export const useAuthStore = defineStore('auth', {
         isAuthenticated: false,
       };
     }
+  },
+
+  getters: {
+    isAdmin(): boolean {
+      return this.user?.role === 'admin';
+    },
   },
 
   actions: {
@@ -68,6 +75,8 @@ export const useAuthStore = defineStore('auth', {
         if (response.success) {
           this.user = response.user;
           this.isAuthenticated = true;
+          // Update localStorage with latest user data (including role)
+          localStorage.setItem('user', JSON.stringify(this.user));
           return true;
         }
       } catch (error) {

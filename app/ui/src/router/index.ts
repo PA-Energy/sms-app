@@ -44,6 +44,12 @@ const router = createRouter({
       component: () => import('../views/BlastHistory.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/users',
+      name: 'Users',
+      component: () => import('../views/Users.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
   ],
 });
 
@@ -65,6 +71,9 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
       next('/login');
     } else if (to.path === '/login' && authStore.isAuthenticated) {
+      next('/dashboard');
+    } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+      // Redirect non-admin users trying to access admin routes
       next('/dashboard');
     } else {
       next();

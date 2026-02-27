@@ -72,13 +72,6 @@
             <span>{{ loading ? 'Signing in...' : 'Sign in' }}</span>
           </button>
         </form>
-
-        <!-- Default Credentials Hint -->
-        <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-          <p class="text-xs text-gray-600 dark:text-gray-400 text-center">
-            Default: <span class="font-mono font-medium">admin</span> / <span class="font-mono font-medium">admin123</span>
-          </p>
-        </div>
       </div>
     </div>
   </div>

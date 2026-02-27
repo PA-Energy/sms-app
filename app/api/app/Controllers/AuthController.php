@@ -55,6 +55,7 @@ class AuthController extends Controller
                     'id' => $user['id'],
                     'username' => $user['username'],
                     'email' => $user['email'],
+                    'role' => $user['role'] ?? 'user',
                 ],
             ]);
         } catch (\Exception $e) {

@@ -24,10 +24,19 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) NULL,
     password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'user') DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_role (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ");
+
+// Add role column if table exists but column doesn't
+try {
+    $db->exec("ALTER TABLE users ADD COLUMN role ENUM('admin', 'user') DEFAULT 'user' AFTER password");
+} catch (\PDOException $e) {
+    // Column might already exist, ignore error
+}
 
 $db->exec("
 CREATE TABLE IF NOT EXISTS sms_messages (
@@ -112,9 +121,13 @@ CREATE TABLE IF NOT EXISTS user_tokens (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ");
 
-// Create admin user
-$stmt = $db->prepare("INSERT IGNORE INTO users (username, email, password) VALUES (?, ?, ?)");
+// Create or update admin user
+$stmt = $db->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'admin') 
+                      ON DUPLICATE KEY UPDATE role = 'admin', email = VALUES(email)");
 $stmt->execute(['admin', 'admin@smsapp.com', password_hash('admin123', PASSWORD_DEFAULT)]);
+
+// Ensure existing admin user has admin role (in case role column was added later)
+$db->exec("UPDATE users SET role = 'admin' WHERE username = 'admin'");
 
 // Cleanup old expired tokens
 $db->exec("DELETE FROM user_tokens WHERE expires_at < NOW() OR revoked = 1");

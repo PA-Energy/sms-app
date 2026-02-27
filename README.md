@@ -17,6 +17,18 @@ A simple cross-platform SMS application with custom PHP MVC backend and Vue.js f
 
 ## Quick Setup
 
+### Option A: Using XAMPP (No PHP Command Line Needed)
+
+See [XAMPP_SETUP.md](XAMPP_SETUP.md) for detailed instructions.
+
+**Quick Steps:**
+1. Copy project to `C:\xampp\htdocs\sms-app\`
+2. Start Apache and MySQL from XAMPP Control Panel
+3. Access API at: `http://localhost/sms-app/app/api/api/health`
+4. Run `setup-xampp.bat` or visit `http://localhost/sms-app/app/api/setup-db.php`
+
+### Option B: Using PHP Built-in Server
+
 ### 1. Start MySQL Database
 
 ```bash

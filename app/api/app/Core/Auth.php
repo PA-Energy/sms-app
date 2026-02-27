@@ -81,7 +81,7 @@ class Auth
         }
 
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT ut.*, u.id, u.username, u.email FROM user_tokens ut 
+        $stmt = $db->prepare("SELECT ut.*, u.id, u.username, u.email, u.role FROM user_tokens ut 
                              INNER JOIN users u ON ut.user_id = u.id 
                              WHERE ut.token = ? AND ut.expires_at > NOW() AND ut.revoked = 0");
         $stmt->execute([$token]);
@@ -92,6 +92,7 @@ class Auth
                 'id' => $result['user_id'],
                 'username' => $result['username'],
                 'email' => $result['email'],
+                'role' => $result['role'] ?? 'user',
             ];
         }
 
@@ -134,5 +135,22 @@ class Auth
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("DELETE FROM user_tokens WHERE expires_at < NOW() OR revoked = 1");
         $stmt->execute();
+    }
+
+    public static function requireAdmin()
+    {
+        $user = self::requireAuth();
+        if ($user['role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['error' => 'Forbidden: Admin access required']);
+            exit;
+        }
+        return $user;
+    }
+
+    public static function isAdmin()
+    {
+        $user = self::getCurrentUser();
+        return $user && ($user['role'] ?? 'user') === 'admin';
     }
 }

@@ -1,0 +1,20 @@
+# Vue Router History Mode Support
+# This file should be copied to the deployment directory (ui/) after build
+# Adjust RewriteBase if your app is in a subdirectory
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # If deployed to /sms-app/ui/, use: RewriteBase /sms-app/ui/
+  # If deployed to root, use: RewriteBase /
+  RewriteBase /sms-app/ui/
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /sms-app/ui/index.html [L]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>

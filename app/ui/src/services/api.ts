@@ -168,6 +168,32 @@ class ApiService {
     const response = await this.api.get(`/sms/blast/${id}/progress`);
     return response.data;
   }
+
+  // User Management endpoints (Admin only)
+  async getUsers(params?: { page?: number; per_page?: number; search?: string }) {
+    const response = await this.api.get('/users', { params });
+    return response.data;
+  }
+
+  async createUser(userData: { username: string; email: string; password: string; role?: string }) {
+    const response = await this.api.post('/users', userData);
+    return response.data;
+  }
+
+  async updateUser(id: number, userData: { username?: string; email?: string; password?: string; role?: string }) {
+    const response = await this.api.put(`/users/${id}`, userData);
+    return response.data;
+  }
+
+  async deleteUser(id: number) {
+    const response = await this.api.delete(`/users/${id}`);
+    return response.data;
+  }
+
+  async getUser(id: number) {
+    const response = await this.api.get(`/users/${id}`);
+    return response.data;
+  }
 }
 
 export default new ApiService();
