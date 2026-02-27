@@ -5,7 +5,9 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Inbox</h1>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ messages.length }} messages</p>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {{ pagination?.total ?? messages.length }} {{ pagination?.total === 1 ? 'message' : 'messages' }}
+          </p>
         </div>
         <div class="flex gap-2">
           <button
@@ -155,11 +157,47 @@ const loadMessages = async (page = 1) => {
     // API returns: { success: true, data: [...], pagination: {...} }
     // api.getInbox() already unwraps response.data, so response is the JSON body
     console.log('Inbox API Response:', response);
-    messages.value = response.data || [];
-    pagination.value = response.pagination || null;
+    
+    // Handle different response structures for compatibility
+    if (response) {
+      // Check if response has the expected structure: { success: true, data: [...], pagination: {...} }
+      if (response.success !== false && response.data !== undefined) {
+        // Normal response structure
+        messages.value = Array.isArray(response.data) ? response.data : [];
+        pagination.value = response.pagination || null;
+      } 
+      // Fallback: check if data is nested differently (e.g., response.data.data)
+      else if (response.data && Array.isArray(response.data.data)) {
+        messages.value = response.data.data;
+        pagination.value = response.data.pagination || response.pagination || null;
+      }
+      // Fallback: if response is directly an array (unlikely but possible)
+      else if (Array.isArray(response)) {
+        messages.value = response;
+        pagination.value = null;
+      }
+      // Fallback: check for alternative structure
+      else if (response.messages && Array.isArray(response.messages)) {
+        messages.value = response.messages;
+        pagination.value = response.pagination || null;
+      }
+      // If we still have no messages, try to extract from any nested structure
+      else {
+        console.warn('Unexpected response structure:', response);
+        messages.value = [];
+        pagination.value = null;
+      }
+    } else {
+      // No response or null response
+      console.error('API returned null or undefined response');
+      messages.value = [];
+      pagination.value = null;
+    }
+    
     console.log('Loaded messages:', messages.value.length, 'Total:', pagination.value?.total);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to load messages:', error);
+    console.error('Error details:', error.response?.data || error.message);
     messages.value = [];
     pagination.value = null;
   } finally {
