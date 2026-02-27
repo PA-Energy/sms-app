@@ -89,4 +89,12 @@ class SmsMessage
         $stmt = $db->prepare("UPDATE sms_messages SET is_read = 1, updated_at = NOW() WHERE is_read = 0");
         $stmt->execute();
     }
+
+    public static function deleteAll()
+    {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("DELETE FROM sms_messages");
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
 }

@@ -17,28 +17,29 @@ class SmsSyncService
     public function syncInbox()
     {
         try {
+            // Fetch all messages from GoIP
             $messages = $this->goIpService->fetchInbox();
+            
+            // Delete all existing messages to avoid duplicates
+            SmsMessage::deleteAll();
+            
+            // Insert all messages from GoIP
             $syncedCount = 0;
-            $skippedCount = 0;
-
             foreach ($messages as $message) {
                 $receivedAt = $this->parseGoIpDate($message['date']);
-
-                if (!SmsMessage::exists($message['phone'], $message['text'], $receivedAt)) {
-                    SmsMessage::create($message['phone'], $message['text'], $receivedAt, $message['date']);
-                    $syncedCount++;
-                } else {
-                    $skippedCount++;
-                }
+                SmsMessage::create($message['phone'], $message['text'], $receivedAt, $message['date']);
+                $syncedCount++;
             }
 
             return [
                 'success' => true,
                 'synced' => $syncedCount,
-                'skipped' => $skippedCount,
+                'deleted' => true,
                 'total' => count($messages),
+                'message' => "Synced {$syncedCount} messages from GoIP device"
             ];
         } catch (\Exception $e) {
+            error_log("SmsSyncService::syncInbox error: " . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
