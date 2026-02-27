@@ -1,6 +1,18 @@
 <?php
 
-use Illuminate\Support\Str;
+// Simple env() function for compatibility (if not already defined)
+if (!function_exists('env')) {
+    function env($key, $default = null) {
+        return $_ENV[$key] ?? $default;
+    }
+}
+
+// Simple database_path() function for compatibility (if not already defined)
+if (!function_exists('database_path')) {
+    function database_path($path = '') {
+        return __DIR__ . '/../database' . ($path ? '/' . ltrim($path, '/') : '');
+    }
+}
 
 return [
 
@@ -21,8 +33,8 @@ return [
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
+            'database' => env('DB_DATABASE', 'sms-app'),
+            'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
@@ -74,7 +86,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', strtolower(str_replace(' ', '_', env('APP_NAME', 'sms_app'))).'_database_'),
         ],
 
         'default' => [

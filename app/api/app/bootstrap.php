@@ -5,17 +5,28 @@ if (file_exists(__DIR__ . '/../.env')) {
     $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
         list($name, $value) = explode('=', $line, 2);
         $_ENV[trim($name)] = trim($value);
     }
 }
 
-// Database configuration
-define('DB_HOST', $_ENV['DB_HOST'] ?? '127.0.0.1');
-define('DB_PORT', $_ENV['DB_PORT'] ?? '3306');
-define('DB_NAME', $_ENV['DB_DATABASE'] ?? 'sms_app');
-define('DB_USER', $_ENV['DB_USERNAME'] ?? 'root');
-define('DB_PASS', $_ENV['DB_PASSWORD'] ?? 'sms_app_root_password');
+// Load database config from config/database.php if it exists
+$dbConfig = null;
+if (file_exists(__DIR__ . '/../config/database.php')) {
+    $dbConfigArray = require __DIR__ . '/../config/database.php';
+    if (isset($dbConfigArray['connections']['mysql'])) {
+        $dbConfig = $dbConfigArray['connections']['mysql'];
+    }
+}
+
+// Database configuration - priority: .env > config/database.php > defaults
+// The config file's env() calls will use $_ENV values we loaded above
+define('DB_HOST', $_ENV['DB_HOST'] ?? ($dbConfig['host'] ?? '127.0.0.1'));
+define('DB_PORT', $_ENV['DB_PORT'] ?? ($dbConfig['port'] ?? '3306'));
+define('DB_NAME', $_ENV['DB_DATABASE'] ?? ($dbConfig['database'] ?? 'sms-app'));
+define('DB_USER', $_ENV['DB_USERNAME'] ?? ($dbConfig['username'] ?? 'root'));
+define('DB_PASS', $_ENV['DB_PASSWORD'] ?? ($dbConfig['password'] ?? ''));
 
 // Session token expiry (hours)
 define('TOKEN_EXPIRY_HOURS', $_ENV['TOKEN_EXPIRY_HOURS'] ?? 24);
